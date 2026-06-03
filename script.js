@@ -1,4 +1,4 @@
-const CATEGORY_ORDER = [
+﻿const CATEGORY_ORDER = [
   ['Inata', 'Artespadas Inatas'],
   ['Adaga', 'Artespadas de Adaga'],
   ['Espada', 'Artespadas de Espada'],
@@ -25,9 +25,8 @@ const FIELD_DEFINITIONS = [
   ['Tipo', 'Tipo registrado no campo tipo.']
 ];
 
-const EMPTY_EFFECT_TEXT = 'Não informado na base fornecida.';
-const state = { artespadas: [], filtered: [], categories: [] };
-
+const state = { artespadas: [], filtered: [] };
+state.categories = [];
 const $ = (selector) => document.querySelector(selector);
 const unique = (items) => [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }));
 const toFocus = (value) => value && !['-', '—'].includes(value) ? `${value} Foco` : value || '—';
@@ -105,12 +104,12 @@ function loadJsonWithIframe(path, previousError) {
 function byBookOrder(a, b) {
   const ca = categorySortIndex(a.categoria);
   const cb = categorySortIndex(b.categoria);
+
   return (ca - cb)
     || a.categoria.localeCompare(b.categoria, 'pt-BR')
     || (Number(a.rank || 0) - Number(b.rank || 0))
     || a.nome.localeCompare(b.nome, 'pt-BR');
 }
-
 function categorySortIndex(categoryName) {
   const officialIndex = CATEGORY_ORDER.findIndex(([category]) => category === categoryName);
   return officialIndex >= 0 ? officialIndex : CATEGORY_ORDER.length;
@@ -132,20 +131,13 @@ function detectCategories() {
   state.categories = [...official, ...extras];
 }
 
-function hasMechanicalEffect(art) {
-  const value = art.efeito;
-  if (value === undefined || value === null) return false;
-  const normalized = String(value).trim();
-  return normalized !== '' && normalized !== EMPTY_EFFECT_TEXT;
-}
-
 function optionList(values, firstLabel) {
   return `<option value="">${firstLabel}</option>` + values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
 }
 
 function setupActions() {
-  $('#printButton')?.addEventListener('click', () => window.print());
-  $('#pdfButton')?.addEventListener('click', () => window.print());
+  $('#printButton').addEventListener('click', () => window.print());
+  $('#pdfButton').addEventListener('click', () => window.print());
 }
 
 function setupFilters() {
@@ -242,7 +234,7 @@ function renderChapters() {
     return `
       <section class="chapter ${items.length ? '' : 'hidden'}" id="${slugify(title)}">
         <div class="chapter-header">
-          <div><p class="kicker">Categoria</p><h2>${escapeHtml(title)}</h2></div>
+          <div><p class="kicker">Categoria</p><h2>${title}</h2></div>
           <small>${items.length} registros</small>
         </div>
         ${categoryStats(items)}
@@ -297,7 +289,7 @@ function renderCard(art) {
 
         <div class="info-block text-column">
           <div class="text-block narrative"><h4>Descrição Narrativa</h4><p>${escapeHtml(art.descricao)}</p></div>
-          ${renderEffectBlock(art)}
+          <div class="text-block mechanic"><h4>Efeito Mecânico</h4><p>${escapeHtml(art.efeito)}</p></div>
           <div class="text-block notes"><h4>Observações</h4><p>${escapeHtml(art.observacoes)}</p></div>
         </div>
       </div>
@@ -308,13 +300,6 @@ function renderCard(art) {
       </nav>
     </article>
   `;
-}
-
-function renderEffectBlock(art) {
-  if (!hasMechanicalEffect(art)) {
-    return '<div class="text-block mechanic muted-effect"><h4>Efeito Mecânico</h4><p aria-label="Efeito mecânico não informado">—</p></div>';
-  }
-  return `<div class="text-block mechanic"><h4>Efeito Mecânico</h4><p>${escapeHtml(art.efeito)}</p></div>`;
 }
 
 function navLink(art, label, extraClass = '') {
