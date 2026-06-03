@@ -26,6 +26,7 @@ const FIELD_DEFINITIONS = [
 ];
 
 const state = { artespadas: [], filtered: [] };
+state.categories = [];
 const $ = (selector) => document.querySelector(selector);
 const unique = (items) => [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }));
 const toFocus = (value) => value && !['-', '—'].includes(value) ? `${value} Foco` : value || '—';
@@ -101,9 +102,33 @@ function loadJsonWithIframe(path, previousError) {
 }
 
 function byBookOrder(a, b) {
-  const ca = CATEGORY_ORDER.findIndex(([category]) => category === a.categoria);
-  const cb = CATEGORY_ORDER.findIndex(([category]) => category === b.categoria);
-  return (ca - cb) || (Number(a.rank || 0) - Number(b.rank || 0)) || a.nome.localeCompare(b.nome, 'pt-BR');
+  const ca = categorySortIndex(a.categoria);
+  const cb = categorySortIndex(b.categoria);
+
+  return (ca - cb)
+    || a.categoria.localeCompare(b.categoria, 'pt-BR')
+    || (Number(a.rank || 0) - Number(b.rank || 0))
+    || a.nome.localeCompare(b.nome, 'pt-BR');
+}
+function categorySortIndex(categoryName) {
+  const officialIndex = CATEGORY_ORDER.findIndex(([category]) => category === categoryName);
+  return officialIndex >= 0 ? officialIndex : CATEGORY_ORDER.length;
+}
+
+function categoryTitle(categoryName) {
+  const official = CATEGORY_ORDER.find(([category]) => category === categoryName);
+  return official ? official[1] : categoryName;
+}
+
+function detectCategories() {
+  const found = unique(state.artespadas.map((art) => art.categoria));
+  const official = CATEGORY_ORDER
+    .map(([category]) => category)
+    .filter((category) => found.includes(category));
+  const extras = found
+    .filter((category) => !CATEGORY_ORDER.some(([officialCategory]) => officialCategory === category))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  state.categories = [...official, ...extras];
 }
 
 function optionList(values, firstLabel) {
@@ -165,7 +190,10 @@ function renderDefinitions() {
 }
 
 function renderToc() {
-  const chapterLinks = CATEGORY_ORDER.map(([category, title]) => `<a href="#${slugify(title)}"><span>${title}</span><small>${countBy('categoria', category)}</small></a>`).join('');
+  const chapterLinks = state.categories.map((category) => {
+    const title = categoryTitle(category);
+    return `<a href="#${slugify(title)}"><span>${escapeHtml(title)}</span><small>${countBy('categoria', category)}</small></a>`;
+  }).join('');
   $('#tocLinks').innerHTML = `
     <a href="#intro"><span>Introdução ao Sistema de Artespadas</span></a>
     <a href="#filtros"><span>Busca e Filtros</span></a>
@@ -200,7 +228,8 @@ function categoryStats(items) {
 }
 
 function renderChapters() {
-  $('#chapters').innerHTML = CATEGORY_ORDER.map(([category, title]) => {
+  $('#chapters').innerHTML = state.categories.map((category) => {
+    const title = categoryTitle(category);
     const items = state.filtered.filter((art) => art.categoria === category);
     return `
       <section class="chapter ${items.length ? '' : 'hidden'}" id="${slugify(title)}">
@@ -294,8 +323,8 @@ function renderIndexes() {
     .map((art) => indexLink(art, `${art.categoria} · Rank ${art.rank}`))
     .join('');
 
-  $('#categoryIndex').innerHTML = CATEGORY_ORDER.map(([category, title]) => (
-    `<a href="#${slugify(title)}"><span>${title}</span><small>${countBy('categoria', category)} Artespadas</small></a>`
+  $('#categoryIndex').innerHTML = state.categories.map((category) => (
+    `<a href="#${slugify(categoryTitle(category))}"><span>${escapeHtml(categoryTitle(category))}</span><small>${countBy('categoria', category)} Artespadas</small></a>`
   )).join('');
 
   renderGroupedIndex('#rankIndex', groupBy(state.artespadas, (art) => `Rank ${art.rank}`));
@@ -338,6 +367,7 @@ function renderGroupedIndex(selector, groups) {
 async function init() {
   try {
     state.artespadas = (await loadJson('artespadas.json')).sort(byBookOrder);
+    detectCategories();
     state.filtered = [...state.artespadas];
     setupActions();
     renderStats();
