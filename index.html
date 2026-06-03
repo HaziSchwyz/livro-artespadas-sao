@@ -1,0 +1,105 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Databook Oficial de Artespadas - SAO RPG</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="home" id="topo">
+    <div class="home-frame">
+      <p class="kicker">AINCRAD SYSTEM CORE</p>
+      <h1>Databook Oficial de Artespadas</h1>
+      <p class="home-subtitle">Catálogo mecânico de Artespadas renderizado diretamente de <code>artespadas.json</code>.</p>
+      <div class="home-actions no-print">
+        <a class="action primary" href="#sumario">Abrir sumário</a>
+        <a class="action" href="#filtros">Buscar Artespada</a>
+        <button class="action" type="button" id="printButton">Modo impressão</button>
+        <button class="action" type="button" id="pdfButton">Exportar PDF</button>
+      </div>
+      <div class="home-stats" aria-label="Estatísticas gerais">
+        <span><strong id="totalArtespadas">0</strong>Artespadas</span>
+        <span><strong id="totalCategorias">0</strong>Categorias</span>
+        <span><strong id="totalRanks">0</strong>Ranks</span>
+        <span><strong id="totalTipos">0</strong>Tipos</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel intro-panel" id="intro">
+      <div class="section-title">
+        <p class="kicker">Sistema</p>
+        <h2>Introdução ao Sistema de Artespadas</h2>
+      </div>
+      <p>Este databook organiza as Artespadas existentes no arquivo JSON. Cada registro apresenta identificação, categoria, classe, rank, custo, dano, crítico, alcance, tipo, descrição, efeito e observações.</p>
+      <p>Os textos mecânicos exibidos nos cartões são carregados do JSON. Campos sem informação mecânica própria permanecem com o valor registrado no JSON.</p>
+      <div class="definition-grid" id="definitionGrid"></div>
+    </section>
+
+    <section class="panel toc-panel" id="sumario">
+      <div class="section-title">
+        <p class="kicker">Navegação</p>
+        <h2>Sumário navegável</h2>
+      </div>
+      <nav class="toc-grid" id="tocLinks" aria-label="Sumário do databook"></nav>
+    </section>
+
+    <section class="panel controls-panel no-print" id="filtros">
+      <div class="section-title compact-title">
+        <p class="kicker">Consulta</p>
+        <h2>Busca e filtros</h2>
+      </div>
+      <div class="filters">
+        <label>
+          <span>Buscar por nome</span>
+          <input id="searchInput" type="search" placeholder="Ex.: Cortar, Vorpal, Escudo">
+        </label>
+        <label>
+          <span>Categoria / Arma</span>
+          <select id="categoryFilter"></select>
+        </label>
+        <label>
+          <span>Classe / Rank / Tier</span>
+          <select id="rankFilter"></select>
+        </label>
+        <label>
+          <span>Tipo</span>
+          <select id="typeFilter"></select>
+        </label>
+        <button id="clearFilters" type="button">Limpar filtros</button>
+      </div>
+      <p class="result-count" id="resultCount">Carregando Artespadas...</p>
+    </section>
+
+    <div id="chapters"></div>
+
+    <section class="panel index-panel" id="indice-nome">
+      <div class="section-title"><p class="kicker">Índice</p><h2>Índice por Nome</h2></div>
+      <div class="link-index" id="nameIndex"></div>
+    </section>
+
+    <section class="panel index-panel" id="indice-categoria">
+      <div class="section-title"><p class="kicker">Índice</p><h2>Índice por Categoria</h2></div>
+      <div class="link-index" id="categoryIndex"></div>
+    </section>
+
+    <section class="panel index-panel" id="indice-rank">
+      <div class="section-title"><p class="kicker">Índice</p><h2>Índice por Rank</h2></div>
+      <div class="group-index" id="rankIndex"></div>
+    </section>
+
+    <section class="panel index-panel" id="indice-tipo">
+      <div class="section-title"><p class="kicker">Índice</p><h2>Índice por Tipo</h2></div>
+      <div class="group-index" id="typeIndex"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer no-print">
+    <a href="#topo">Voltar ao topo</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
