@@ -267,7 +267,15 @@ button { cursor: pointer; padding: 0 16px; color: #06101c; background: var(--cya
 .card-body { display: grid; grid-template-columns: minmax(260px,.86fr) minmax(330px,1.1fr) minmax(390px,1.28fr); gap: 14px; align-items: stretch; }
 .info-block { padding: 14px; }
 .info-block h4 { margin: 0 0 10px; color: var(--cyan); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
-.prep-grid { display: grid; grid-template-columns: 90px 1fr; gap: 8px; }
+.prep-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.prep-grid .stat-box:last-child {
+  grid-column: 1 / -1;
+}
 .combat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .stat-box.highlight { border-color: rgba(217,180,93,.46); background: rgba(217,180,93,.09); }
 .penalty { color: var(--red); }
